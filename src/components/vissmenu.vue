@@ -39,13 +39,21 @@
           </el-col>
         </el-row>
       </el-aside>
-      <el-main>Main</el-main>
+      <el-main>
+        <component v-bind:is="currentTabComponent" class="tab"></component>
+      </el-main>
     </el-container>
   </el-container>
 </template>
 
 <script>
+
+import createList from "./entrust/createList";
+
 export default {
+  components:{
+    createList
+  },
   data() {
     return {
       activeIndex: "1",
@@ -65,7 +73,7 @@ export default {
       //   console.log(response);
       //   this.menus = response.data.Data;
       // })
-      .then((response)=>{
+      .then(response => {
         console.log(response);
         this.menus = response.data.Data;
       })
@@ -73,7 +81,11 @@ export default {
         console.log(error);
       });
   },
-
+  computed: {
+    currentTabComponent: function() {
+      return "createList";
+    }
+  },
   methods: {
     handleSelect(key, keyPath) {
       console.log(key, keyPath);
