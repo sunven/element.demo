@@ -3,26 +3,30 @@
 import Vue from 'vue'
 import App from './App'
 
+//element-ui
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 
-//
-import helloWorld from './components/HelloWorld';
-
+//axios
 import axios from 'axios'
 Vue.prototype.$ajax = axios
 
 Vue.use(ElementUI);
-//
-Vue.use(helloWorld);
 
+//
 Vue.config.productionTip = false
 
-var baseHost='';
+var baseHost = '';
+
+import router from "./router.js"
+
 
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
-  components: { App },
+  router,
+  components: {
+    App
+  },
   template: '<App/>'
 })

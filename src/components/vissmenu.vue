@@ -32,7 +32,9 @@
                   <span>{{item.MenuName}}</span>
                 </template>
                 <el-menu-item-group>
-                  <el-menu-item v-for="(item1,index1) in item.Children" :key="item1.Id" :index="index+'-'+index1">{{item1.MenuName}}</el-menu-item>
+                  <el-menu-item v-for="(item1,index1) in item.Children" :key="item1.Id" :index="index+'-'+index1">
+                    <router-link :to="item1.Url">{{item1.MenuName}}</router-link>
+                  </el-menu-item>
                 </el-menu-item-group>
               </el-submenu>
             </el-menu>
@@ -40,18 +42,18 @@
         </el-row>
       </el-aside>
       <el-main>
-        <component v-bind:is="currentTabComponent" class="tab"></component>
+        <!-- <component v-bind:is="currentTabComponent" class="tab"></component> -->
+        <router-view></router-view>
       </el-main>
     </el-container>
   </el-container>
 </template>
 
 <script>
-
 import createList from "./entrust/createList";
 
 export default {
-  components:{
+  components: {
     createList
   },
   data() {
@@ -63,7 +65,7 @@ export default {
   },
   mounted: function() {
     this.$ajax
-      .get("http://localhost:5617/api/Portal/Passport/GetMenus", {
+      .get("http://localhost:5618/api/Portal/Passport/GetMenus", {
         headers: {
           Authorization:
             "Basic YWRtaW46NmYxODI0MDAwYTZjYzBjYzJlZTIwOGQ1ZDdlYzM3NWU="
