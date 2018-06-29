@@ -26,13 +26,13 @@
         <el-row class="tac">
           <el-col :span="12">
             <el-menu default-active="2" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose">
-              <el-submenu :key="item.Id" v-for="(item, index) in menus.leftMenu" :index="index">
+              <el-submenu :key="'m'+item.Id" v-for="(item, index) in menus.leftMenu" :index="'i'+index">
                 <template slot="title">
                   <i class="el-icon-location"></i>
                   <span>{{item.MenuName}}</span>
                 </template>
                 <el-menu-item-group>
-                  <el-menu-item v-for="(item1,index1) in item.Children" :key="item1.Id" :index="index+'-'+index1">
+                  <el-menu-item v-for="(item1,index1) in item.Children" :key="'m'+item1.Id" :index="index+'-'+index1">
                     <router-link :to="item1.Url">{{item1.MenuName}}</router-link>
                   </el-menu-item>
                 </el-menu-item-group>
@@ -51,7 +51,6 @@
 
 <script>
 import createList from "./entrust/createList";
-
 export default {
   components: {
     createList
@@ -63,7 +62,8 @@ export default {
       menus: {}
     };
   },
-  mounted: function() {
+  created: function() {
+    var vm = this;
     this.$ajax
       .get("http://localhost:5618/api/Portal/Passport/GetMenus", {
         headers: {
@@ -71,22 +71,20 @@ export default {
             "Basic YWRtaW46NmYxODI0MDAwYTZjYzBjYzJlZTIwOGQ1ZDdlYzM3NWU="
         }
       })
-      // .then(function(response) {
-      //   console.log(response);
-      //   this.menus = response.data.Data;
-      // })
       .then(response => {
-        console.log(response);
         this.menus = response.data.Data;
+        // let extendsRoutes = response.data.Data.leftMenu.map(c => {
+        //   return {
+        //     path: c.Url,
+        //     component: { template: "<div>" + c.Url + "</div>" }
+        //     //component: (resolve) => require(['./entrust/createList'], resolve)
+        //   };
+        // });
+        //vm.$router.addRoutes(getRouter(response.data.Data.leftMenu));
       })
       .catch(function(error) {
         console.log(error);
       });
-  },
-  computed: {
-    currentTabComponent: function() {
-      return "createList";
-    }
   },
   methods: {
     handleSelect(key, keyPath) {
@@ -101,27 +99,29 @@ export default {
   }
 };
 
-// [
-//         {
-//           id: 1,
-//           name: "A",
-//           children: [
-//             {
-//               id: 10,
-//               name: "A-1"
-//             }
-//           ]
-//         },
-//         {
-//           id: 2,
-//           name: "B",
-//           children: [
-//             {
-//               id: 20,
-//               name: "B-1"
-//             }
-//           ]
-//         }
-//       ]
+function getRouter(meuns) {
+  let routes = meuns.map(c => {
+    return {
+      path: c.Url.substr(1,c.Url.lastIndexOf('/')-1),
+      component: { template: "<div>" + c.Url + "</div>" },
+      children: c.Children.map(p => {
+        return {
+          path: p.Url.substr(1),
+          component: { template: "<div>" + p.Url + "</div>" }
+        };
+      })
+    };
+  });
+  var arr = [
+    { path: '/', redirect: '/entrust' },
+    {
+      path: "/entrust",
+      component: { template: "<div>entrust</div>" },
+      children: routes
+    }
+  ];
+  console.log(arr);
+  return arr;
+}
 </script>
 

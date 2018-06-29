@@ -29,4 +29,4 @@ new Vue({
     App
   },
   template: '<App/>'
-})
+}).$mount('#app')
