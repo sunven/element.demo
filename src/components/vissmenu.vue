@@ -29,7 +29,9 @@
               <el-submenu :key="'m'+item.Id" v-for="(item, index) in menus.leftMenu" :index="'i'+index">
                 <template slot="title">
                   <i class="el-icon-location"></i>
-                  <router-link :to="item.Url"><span>{{item.MenuName}}</span></router-link>
+                  <router-link :to="item.Url">
+                    <span>{{item.MenuName}}</span>
+                  </router-link>
                 </template>
                 <el-menu-item-group>
                   <el-menu-item v-for="(item1,index1) in item.Children" :key="'m'+item1.Id" :index="index+'-'+index1">
@@ -63,30 +65,16 @@ export default {
     };
   },
   created: function() {
-    var vm = this;
-    this.$ajax
-      .get("http://localhost:5618/api/Portal/Passport/GetMenus", {
-        headers: {
-          Authorization:
-            "Basic YWRtaW46NmYxODI0MDAwYTZjYzBjYzJlZTIwOGQ1ZDdlYzM3NWU="
-        }
-      })
-      .then(response => {
-        this.menus = response.data.Data;
-        // let extendsRoutes = response.data.Data.leftMenu.map(c => {
-        //   return {
-        //     path: c.Url,
-        //     component: { template: "<div>" + c.Url + "</div>" }
-        //     //component: (resolve) => require(['./entrust/createList'], resolve)
-        //   };
-        // });
-        //vm.$router.addRoutes(getRouter(response.data.Data.leftMenu));
-      })
-      .catch(function(error) {
-        console.log(error);
-      });
+    this.loadData();
   },
   methods: {
+    loadData: function() {
+      this.$ajax
+        .get("http://localhost:5618/api/Portal/Passport/GetMenus")
+        .then(response => {
+          this.menus = response;
+        });
+    },
     handleSelect(key, keyPath) {
       console.log(key, keyPath);
     },
@@ -102,7 +90,7 @@ export default {
 function getRouter(meuns) {
   let routes = meuns.map(c => {
     return {
-      path: c.Url.substr(1,c.Url.lastIndexOf('/')-1),
+      path: c.Url.substr(1, c.Url.lastIndexOf("/") - 1),
       component: { template: "<div>" + c.Url + "</div>" },
       children: c.Children.map(p => {
         return {
@@ -113,7 +101,7 @@ function getRouter(meuns) {
     };
   });
   var arr = [
-    { path: '/', redirect: '/entrust' },
+    { path: "/", redirect: "/entrust" },
     {
       path: "/entrust",
       component: { template: "<div>entrust</div>" },

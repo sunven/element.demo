@@ -17,7 +17,7 @@
       </el-form>
     </el-header>
     <el-main>
-      <el-table :data="tableData.Items" border style="width: 100%">
+      <el-table :data="tableData" border style="width: 100%">
         <el-table-column fixed prop="Number" label="编号" width="150">
         </el-table-column>
         <el-table-column prop="StateName" label="状态" width="120">
@@ -37,6 +37,10 @@
           </template>
         </el-table-column>
       </el-table>
+      <div class="block">
+        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pageIndex" :page-sizes="[20, 50, 100]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="totalCount">
+        </el-pagination>
+      </div>
     </el-main>
   </el-container>
 
@@ -50,47 +54,51 @@ export default {
         user: "",
         region: ""
       },
-      tableData: {}
+      tableData: [],
+      pageIndex: 1,
+      pageSize: 20,
+      totalCount: 0
     };
   },
   created: function() {
-    var vm = this;
-    this.$ajax
-      .post(
-        "http://localhost:5618/api/Entrust/Entrust/GetHistoryList",
-        {
+    this.loadData();
+  },
+  methods: {
+    loadData: function() {
+      var vm = this;
+      this.$ajax
+        .post("http://localhost:5618/api/Entrust/Entrust/GetHistoryList", {
           Order: {
             CreateTime: 0
           },
           Page: {
-            PageIndex: 1,
-            PageSize: "20"
+            PageIndex: vm.pageIndex,
+            PageSize: vm.pageSize
           },
           Search: {
-            EntrustTypes: [16941],
+            EntrustTypes: [16941]
             //CreateUserIds: [8797104653716160576]
           }
-        },
-        {
-          headers: {
-            Authorization:
-              "Basic YWRtaW46NmYxODI0MDAwYTZjYzBjYzJlZTIwOGQ1ZDdlYzM3NWU="
-          }
-        }
-      )
-      .then(response => {
-        this.tableData = response.data.Data;
-      })
-      .catch(function(error) {
-        console.log(error);
-      });
-  },
-  methods: {
+        })
+        .then(response => {
+          this.tableData = response.Items;
+          this.totalCount = response.TotalItemCount;
+        });
+    },
     onSubmit() {
-      console.log("submit!");
+      this.loadData();
     },
     handleClick(row) {
       console.log(row);
+    },
+    handleSizeChange(val) {
+      this.pageSize = val;
+      this.pageIndex = 1;
+      this.loadData();
+    },
+    handleCurrentChange(val) {
+      this.pageIndex = val;
+      this.loadData();
     }
   }
 };
