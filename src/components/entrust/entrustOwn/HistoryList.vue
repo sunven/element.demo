@@ -1,15 +1,31 @@
 <template>
   <el-container>
-    <el-header>
-      <el-form :inline="true" :model="formInline" class="demo-form-inline">
-        <el-form-item label="审批人">
-          <el-input v-model="formInline.user" placeholder="审批人"></el-input>
-        </el-form-item>
-        <el-form-item label="活动区域">
-          <el-select v-model="formInline.region" placeholder="活动区域">
-            <el-option label="区域一" value="shanghai"></el-option>
-            <el-option label="区域二" value="beijing"></el-option>
+    <el-header height="120px">
+      <el-form :inline="true" :model="fromSearchData" class="demo-form-inline">
+        <el-form-item label="业务状态">
+          <el-select v-model="fromSearchData.searchState" clearable placeholder="请选择">
+            <el-option v-for="item in formInitData.searchState" :key="item.Value" :label="item.Description" :value="item.Value">
+            </el-option>
           </el-select>
+        </el-form-item>
+        <el-form-item label="物业类型">
+          <el-select v-model="fromSearchData.propertyType" clearable placeholder="请选择">
+            <el-option v-for="item in formInitData.propertyType" :key="item.Id" :label="item.DictText" :value="item.Id">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="所在区县">
+          <el-cascader :options="formInitData.province" @active-item-change="handleItemChange" :props="formSettings.provinceProps"></el-cascader>
+        </el-form-item>
+        <el-form-item label="单据类型">
+          <el-select v-model="fromSearchData.entrustType" clearable placeholder="请选择">
+            <el-option v-for="item in formInitData.entrustType" :key="item.Value" :label="item.Description" :value="item.Value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="创建时间">
+          <el-date-picker v-model="fromSearchData.createTime" type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期">
+          </el-date-picker>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="onSubmit">查询</el-button>
@@ -50,9 +66,25 @@
 export default {
   data() {
     return {
-      formInline: {
-        user: "",
-        region: ""
+      formSettings: {
+        provinceProps: {
+          label: "DictText",
+          value: "Id",
+          children: "Children"
+        }
+      },
+      formInitData: {
+        searchState: [],
+        propertyType: [],
+        entrustType: [],
+        province: []
+      },
+      fromSearchData: {
+        searchState: "",
+        propertyType: "",
+        entrustType: "",
+        createTime: "",
+        province: ""
       },
       tableData: [],
       pageIndex: 1,
@@ -61,9 +93,15 @@ export default {
     };
   },
   created: function() {
+    this.loadSearchForm();
     this.loadData();
   },
   methods: {
+    loadSearchForm: function() {
+      this.$ajax.get("api/Entrust/Entrust/GetSearchForm").then(response => {
+        this.formInitData = response;
+      });
+    },
     loadData: function() {
       var vm = this;
       this.$ajax
@@ -86,6 +124,7 @@ export default {
         });
     },
     onSubmit() {
+      console.log(this.fromSearchData.createTime);
       this.loadData();
     },
     handleClick(row) {
@@ -99,6 +138,24 @@ export default {
     handleCurrentChange(val) {
       this.pageIndex = val;
       this.loadData();
+    },
+    handleItemChange(val) {
+      var selId = val[val.length - 1];
+      console.log("active item:", val);
+      var selectOption;
+      var optionDatas = this.formInitData.province;
+      for (let index = 0; index < val.length; index++) {
+        const element = val[index];
+        selectOption = optionDatas.filter(c => {
+          return c.Id === element;
+        })[0];
+        optionDatas = selectOption.Children;
+      }
+      this.$ajax
+        .get("api/Common/Common/GetArea", { params: { id: selId } })
+        .then(response => {
+          selectOption.Children = response;
+        });
     }
   }
 };
