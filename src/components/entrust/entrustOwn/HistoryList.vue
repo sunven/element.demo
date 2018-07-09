@@ -29,19 +29,24 @@
         </el-form-item>
         <el-form-item label="询价机构">
           <el-popover placement="bottom" width="160" v-model="visible2">
-            <el-tree :data="formInitData.company" :props="formSettings.companyProps" @node-click="handleNodeClick">
+            <!-- <el-tree node-key="Id" :data="formInitData.company" :props="formSettings.companyProps" :check-strictly="true" @node-click="handleNodeClick">
               <span class="custom-tree-node" slot-scope="{ node, data }">
                 <span>
-                  <span v-if="!(data.ParentId==0||data.Type==3||data.Type==4||data.Type==0||data.Type==-1)"><el-checkbox  v-model="checked"></el-checkbox></span>
+                  <span v-if="!(data.ParentId==0||data.Type==3||data.Type==4||data.Type==0||data.Type==-1)">
+                    <el-checkbox v-model="checked"></el-checkbox>
+                  </span>
                   <span>{{ node.label }}</span>
                 </span>
               </span>
+            </el-tree> -->
+            <el-tree node-key="Id" :data="formInitData.company" :props="formSettings.companyProps" :check-strictly="true" @node-click="handleNodeClick" :render-content="renderContent">
             </el-tree>
             <el-input slot="reference">删除</el-input>
           </el-popover>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="onSubmit">查询</el-button>
+          <treenode vif="true" checkboxmodel="true" :nodelabel="checked"></treenode>
         </el-form-item>
       </el-form>
     </el-header>
@@ -76,71 +81,13 @@
 </template>
 
 <script>
+
+
 export default {
+  //components: { treenode },
   data() {
     return {
-      data: [
-        {
-          label: "一级 1",
-          children: [
-            {
-              label: "二级 1-1",
-              children: [
-                {
-                  label: "三级 1-1-1"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          label: "一级 2",
-          children: [
-            {
-              label: "二级 2-1",
-              children: [
-                {
-                  label: "三级 2-1-1"
-                }
-              ]
-            },
-            {
-              label: "二级 2-2",
-              children: [
-                {
-                  label: "三级 2-2-1"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          label: "一级 3",
-          children: [
-            {
-              label: "二级 3-1",
-              children: [
-                {
-                  label: "三级 3-1-1"
-                }
-              ]
-            },
-            {
-              label: "二级 3-2",
-              children: [
-                {
-                  label: "三级 3-2-1"
-                }
-              ]
-            }
-          ]
-        }
-      ],
       checked: false,
-      // defaultProps: {
-      //   children: "children",
-      //   label: "label"
-      // },
       visible2: false,
       formSettings: {
         provinceProps: {
@@ -242,6 +189,33 @@ export default {
     handleNodeClick(data) {
       //this.visible2=false;
       console.log(data);
+    },
+    renderContent(h, { node, data, store }) {
+      return (
+        <treenode vif="!(data.ParentId==0||data.Type==3||data.Type==4||data.Type==0||data.Type==-1)" propchecked="true" nodelabel="checked"></treenode>
+      );
+      // if (
+      //   data.ParentId == 0 ||
+      //   data.Type == 3 ||
+      //   data.Type == 4 ||
+      //   data.Type == 0 ||
+      //   data.Type == -1
+      // ) {
+      //   return (
+      //     <span class="custom-tree-node">
+      //       <span>{node.label}</span>
+      //     </span>
+      //   );
+      // } else {
+      //   return (
+      //     <span class="custom-tree-node">
+      //       <span>
+      //         <el-checkbox v-model="checked" />
+      //       </span>
+      //       <span>{node.label}</span>
+      //     </span>
+      //   );
+      // }
     }
   }
 };

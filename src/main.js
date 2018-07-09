@@ -3,6 +3,9 @@
 import Vue from 'vue'
 import App from './App'
 
+import treenode from "./components/entrust/entrustOwn/treenode.vue";
+Vue.component('treenode', treenode);
+
 //element-ui
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
