@@ -1,6 +1,6 @@
 <template>
   <el-container>
-    <el-header height="120px">
+    <el-header height="240px">
       <el-form :inline="true" :model="fromSearchData" class="demo-form-inline">
         <el-form-item label="业务状态">
           <el-select v-model="fromSearchData.searchState" clearable placeholder="请选择">
@@ -27,6 +27,16 @@
           <el-date-picker v-model="fromSearchData.createTime" type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期">
           </el-date-picker>
         </el-form-item>
+        <el-form-item label="进件时间">
+          <el-date-picker v-model="fromSearchData.incomingTime" type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期">
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item label="分组号">
+          <el-input v-model="fromSearchData.groupNumber">{{fromSearchData.groupNumber}}</el-input>
+        </el-form-item>
+        <el-form-item label="">
+          <el-input v-model="fromSearchData.comCondition">{{fromSearchData.comCondition}}</el-input>
+        </el-form-item>
         <el-form-item label="询价机构">
           <el-popover placement="bottom" width="160" v-model="visible2">
             <!-- <el-tree node-key="Id" :data="formInitData.company" :props="formSettings.companyProps" :check-strictly="true" @node-click="handleNodeClick">
@@ -39,14 +49,40 @@
                 </span>
               </span>
             </el-tree> -->
-            <el-tree node-key="Id" :data="formInitData.company" :props="formSettings.companyProps" :check-strictly="true" @node-click="handleNodeClick" :render-content="renderContent">
+            <el-tree node-key="Id" :data="formInitData.company" :props="formSettings.companyProps" :expand-on-click-node="false" show-checkbox @check="companyHandleCheck">
             </el-tree>
-            <el-input slot="reference">删除</el-input>
+            <el-input v-model="fromSearchData.ListCompanyName" :disabled="true" slot="reference">{{fromSearchData.ListCompanyName}}</el-input>
           </el-popover>
+        </el-form-item>
+        <el-form-item label="询价人">
+          <el-popover placement="bottom" width="160" v-model="visible1">
+            <el-tree node-key="Id" :data="formInitData.ListInquirerId" :props="formSettings.companyProps" :expand-on-click-node="false" show-checkbox @check="inquirerHandleCheck">
+            </el-tree>
+            <el-input v-model="fromSearchData.ListInquirerName" :disabled="true" slot="reference">{{fromSearchData.ListInquirerName}}</el-input>
+          </el-popover>
+        </el-form-item>
+        <el-form-item label="委托方机构">
+          <el-popover placement="bottom" width="160" v-model="entrustOrgVisible">
+            <el-tree node-key="Id" :data="formInitData.company" :props="formSettings.companyProps" :expand-on-click-node="false" show-checkbox @check="entrustOrgHandleCheck">
+            </el-tree>
+            <el-input v-model="fromSearchData.ListEntrustOrgName" :disabled="true" slot="reference">{{fromSearchData.ListEntrustOrgName}}</el-input>
+          </el-popover>
+        </el-form-item>
+        <el-form-item label="委托方联系人">
+          <el-input v-model="fromSearchData.entrustLinkman">{{fromSearchData.entrustLinkman}}</el-input>
+        </el-form-item>
+        <el-form-item label="需现场查勘">
+          <el-select v-model="fromSearchData.isOrientation" clearable placeholder="请选择">
+            <el-option v-for="item in formInitData.isOrientation" :key="item.value" :label="item.label" :value="item.Value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="价值时点">
+          <el-date-picker v-model="fromSearchData.timePoint" type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期">
+          </el-date-picker>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="onSubmit">查询</el-button>
-          <treenode vif="true" checkboxmodel="true" :nodelabel="checked"></treenode>
         </el-form-item>
       </el-form>
     </el-header>
@@ -81,14 +117,16 @@
 </template>
 
 <script>
-
+import treenode from "./treenode";
 
 export default {
-  //components: { treenode },
+  components: { treenode },
   data() {
     return {
       checked: false,
+      visible1: false,
       visible2: false,
+      entrustOrgVisible: false,
       formSettings: {
         provinceProps: {
           label: "DictText",
@@ -97,7 +135,8 @@ export default {
         },
         companyProps: {
           children: "Children",
-          label: "Name"
+          label: "Name",
+          disabled: "NoCheck"
         }
       },
       formInitData: {
@@ -105,15 +144,28 @@ export default {
         propertyType: [],
         entrustType: [],
         province: [],
-        company: []
+        company: [],
+        ListInquirerId: [],
+        isOrientation: []
       },
       fromSearchData: {
         searchState: "",
         propertyType: "",
         entrustType: "",
         createTime: "",
-        province: "",
-        company: ""
+        incomingTime: "",
+        groupNumber: "",
+        comCondition: "",
+        province: 0,
+        ListCompanyId: [],
+        ListCompanyName: "",
+        ListInquirerId: [],
+        ListInquirerName: "",
+        ListEntrustOrgId: [],
+        ListEntrustOrgName: "",
+        entrustLinkman: "",
+        isOrientation: "",
+        timePoint: ""
       },
       tableData: [],
       pageIndex: 1,
@@ -129,6 +181,16 @@ export default {
     loadSearchForm: function() {
       this.$ajax.get("api/Entrust/Entrust/GetSearchForm").then(response => {
         this.formInitData = response;
+        this.formInitData.isOrientation = [
+          {
+            value: "true",
+            label: "是"
+          },
+          {
+            value: "false",
+            label: "否"
+          }
+        ];
       });
     },
     loadData: function() {
@@ -142,10 +204,7 @@ export default {
             PageIndex: vm.pageIndex,
             PageSize: vm.pageSize
           },
-          Search: {
-            EntrustTypes: [16941]
-            //CreateUserIds: [8797104653716160576]
-          }
+          Search: this.fromSearchData
         })
         .then(response => {
           this.tableData = response.Items;
@@ -186,13 +245,50 @@ export default {
           selectOption.Children = response;
         });
     },
-    handleNodeClick(data) {
-      //this.visible2=false;
-      console.log(data);
+    companyHandleCheck(data, data1) {
+      this.fromSearchData.ListCompanyId = data1.checkedKeys;
+      var names = data1.checkedNodes.map(c => {
+        return c.Name;
+      });
+      this.fromSearchData.ListCompanyName = names.join();
+      //
+      this.$ajax
+        .get("api/Common/Common/GetCustomUser", {
+          params: { companyIdString: this.fromSearchData.ListCompanyId.join() }
+        })
+        .then(response => {
+          this.formInitData.ListInquirerId = response;
+        });
+    },
+    inquirerHandleCheck(data, data1) {
+      this.fromSearchData.ListInquirerId = data1.checkedKeys;
+      var names = data1.checkedNodes.map(c => {
+        return c.Name;
+      });
+      this.fromSearchData.ListInquirerName = names.join();
+    },
+    entrustOrgHandleCheck(data, data1) {
+      this.fromSearchData.ListEntrustOrgId = data1.checkedKeys;
+      var names = data1.checkedNodes.map(c => {
+        return c.Name;
+      });
+      this.fromSearchData.ListEntrustOrgName = names.join();
     },
     renderContent(h, { node, data, store }) {
       return (
-        <treenode vif="!(data.ParentId==0||data.Type==3||data.Type==4||data.Type==0||data.Type==-1)" propchecked="true" nodelabel="checked"></treenode>
+        <treenode
+          vif={
+            !(
+              data.ParentId == 0 ||
+              data.Type == 3 ||
+              data.Type == 4 ||
+              data.Type == 0 ||
+              data.Type == -1
+            )
+          }
+          propchecked={false}
+          nodelabel={node.label}
+        />
       );
       // if (
       //   data.ParentId == 0 ||
