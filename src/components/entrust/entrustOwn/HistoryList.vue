@@ -87,6 +87,7 @@
       </el-form>
     </el-header>
     <el-main>
+      <create :dialogVisible="dialogAddVisible" @changeVisible="getVisible"></create>
       <el-table :data="tableData" border style="width: 100%">
         <el-table-column fixed prop="Number" label="编号" width="150">
         </el-table-column>
@@ -118,11 +119,13 @@
 
 <script>
 import treenode from "./treenode";
+import create from "./create";
 
 export default {
-  components: { treenode },
+  components: { treenode, create },
   data() {
     return {
+      dialogAddVisible: false,
       checked: false,
       visible1: false,
       visible2: false,
@@ -157,7 +160,7 @@ export default {
         groupNumber: "",
         comCondition: "",
         province: 0,
-        ListCompanyId: [],
+        ListCompanyId: [1],
         ListCompanyName: "",
         ListInquirerId: [],
         ListInquirerName: "",
@@ -196,7 +199,7 @@ export default {
     loadData: function() {
       var vm = this;
       this.$ajax
-        .post("http://localhost:5618/api/Entrust/Entrust/GetHistoryList", {
+        .post("api/Entrust/Entrust/GetHistoryList", {
           Order: {
             CreateTime: 0
           },
@@ -216,7 +219,8 @@ export default {
       this.loadData();
     },
     handleClick(row) {
-      console.log(row);
+      this.dialogAddVisible = true;
+      console.log(this.dialogAddVisible);
     },
     handleSizeChange(val) {
       this.pageSize = val;
@@ -273,6 +277,9 @@ export default {
         return c.Name;
       });
       this.fromSearchData.ListEntrustOrgName = names.join();
+    },
+    getVisible: function(value) {
+      this.dialogAddVisible = value;
     },
     renderContent(h, { node, data, store }) {
       return (
