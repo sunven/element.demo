@@ -118,6 +118,7 @@
 </template>
 
 <script>
+
 import treenode from "./treenode";
 import create from "./create";
 
@@ -233,7 +234,6 @@ export default {
     },
     handleItemChange(val) {
       var selId = val[val.length - 1];
-      console.log("active item:", val);
       var selectOption;
       var optionDatas = this.formInitData.province;
       for (let index = 0; index < val.length; index++) {
@@ -243,11 +243,20 @@ export default {
         })[0];
         optionDatas = selectOption.Children;
       }
-      this.$ajax
-        .get("api/Common/Common/GetArea", { params: { id: selId } })
-        .then(response => {
-          selectOption.Children = response;
-        });
+      var regionData = this.$store.getters.getData(selId);
+      if (regionData == null) {
+        this.$ajax
+          .get("api/Common/Common/GetArea", { params: { id: selId } })
+          .then(response => {
+            selectOption.Children = response;
+            this.$store.commit("addRegionData", {
+              pId: selId,
+              data: response
+            });
+          });
+      }else{
+        selectOption.Children=regionData.data;
+      }
     },
     companyHandleCheck(data, data1) {
       this.fromSearchData.ListCompanyId = data1.checkedKeys;

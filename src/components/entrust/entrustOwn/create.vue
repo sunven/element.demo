@@ -33,9 +33,24 @@
             </el-col>
           </el-row>
         </el-collapse-item>
-        <el-collapse-item title="反馈 Feedback" name="2">
-          <div>控制反馈：通过界面样式和交互动效让用户可以清晰的感知自己的操作；</div>
-          <div>页面反馈：操作后，通过页面元素的变化清晰地展现当前状态。</div>
+        <el-collapse-item title="业务信息" name="2">
+          <el-row :gutter="20">
+            <el-col :span="6">
+              <el-form-item label="所在区县" :label-width="formLabelWidth">
+                <!-- <el-cascader :options="formInitData.province" @active-item-change="handleItemChange" :props="formSettings.provinceProps"></el-cascader> -->
+              </el-form-item>
+            </el-col>
+            <el-col :span="6">
+              <el-form-item label="询价机构联系电话" :label-width="formLabelWidth">
+                <el-input v-model="form.name" auto-complete="off"></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="6">
+              <el-form-item label="询价机构邮箱" :label-width="formLabelWidth">
+                <el-input v-model="form.name" auto-complete="off"></el-input>
+              </el-form-item>
+            </el-col>
+          </el-row>
         </el-collapse-item>
         <el-collapse-item title="效率 Efficiency" name="3">
           <div>简化流程：设计简洁直观的操作流程；</div>
