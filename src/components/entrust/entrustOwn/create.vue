@@ -6,7 +6,11 @@
           <el-row :gutter="20">
             <el-col :span="6">
               <el-form-item label="询价机构" :label-width="formLabelWidth">
-                <el-input v-model="form.name" auto-complete="off"></el-input>
+                <el-popover placement="bottom" width="160" v-model="visible2">
+                  <el-tree node-key="Id" :data="this.companyTreeData" :props="formSettings.companyProps" :expand-on-click-node="false" show-checkbox @check="companyHandleCheck">
+                  </el-tree>
+                  <el-input v-model="fromSearchData.ListCompanyName" :disabled="true" slot="reference">{{fromSearchData.ListCompanyName}}</el-input>
+                </el-popover>
               </el-form-item>
             </el-col>
             <el-col :span="14">
@@ -79,11 +83,14 @@
   </el-dialog>
 </template>
 <script>
+import { mapState } from "vuex";
+
 export default {
   name: "create",
   props: ["dialogVisible"],
   data() {
     return {
+      visible2: false,
       activeNames: ["1"],
       visible: this.dialogVisible,
       form: {
@@ -96,8 +103,44 @@ export default {
         resource: "",
         desc: ""
       },
-      formLabelWidth: "120px"
+      formLabelWidth: "120px",
+      formSettings: {
+        provinceProps: {
+          label: "DictText",
+          value: "Id",
+          children: "Children"
+        },
+        companyProps: {
+          children: "Children",
+          label: "Name",
+          disabled: "NoCheck"
+        }
+      },
+      fromSearchData: {
+        searchState: "",
+        propertyType: "",
+        entrustType: "",
+        createTime: "",
+        incomingTime: "",
+        groupNumber: "",
+        comCondition: "",
+        province: 0,
+        ListCompanyId: [1],
+        ListCompanyName: "",
+        ListInquirerId: [],
+        ListInquirerName: "",
+        ListEntrustOrgId: [],
+        ListEntrustOrgName: "",
+        entrustLinkman: "",
+        isOrientation: "",
+        timePoint: ""
+      }
     };
+  },
+  computed: {
+    ...mapState({
+      companyTreeData: state => state.entrust_store.companyTreeData
+    })
   },
   methods: {
     handleChange(val) {
@@ -109,7 +152,8 @@ export default {
     },
     handleClosed: function() {
       this.setVisible();
-    }
+    },
+    companyHandleCheck(data, data1) {}
   },
   watch: {
     dialogVisible(val) {

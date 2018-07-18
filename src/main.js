@@ -11,6 +11,10 @@ Vue.component('treenode', treenode);
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 
+//store
+import lStorage from 'store'
+Vue.prototype.$lStorage = lStorage
+
 //axios
 import axios from 'axios'
 //全局的 axios 默认值
@@ -42,6 +46,17 @@ new Vue({
   router,
   components: {
     App
+  },
+  created: function () {
+    let regionData = this.$lStorage.get("regionData");
+    if (regionData !== undefined) {
+      this.$store.commit("initRegionData", regionData);
+    }
+    //
+    let companyTreeData = this.$lStorage.get("companyTreeData");
+    if (companyTreeData !== undefined) {
+      this.$store.commit("setCompanyTreeData", companyTreeData);
+    }
   },
   template: '<App/>'
 }).$mount('#app')

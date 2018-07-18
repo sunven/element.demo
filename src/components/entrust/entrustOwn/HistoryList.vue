@@ -122,6 +122,10 @@
 import treenode from "./treenode";
 import create from "./create";
 
+import { mapState } from 'vuex'
+import { mapGetters } from 'vuex'
+import { mapActions  } from 'vuex'
+
 export default {
   components: { treenode, create },
   data() {
@@ -177,13 +181,19 @@ export default {
       totalCount: 0
     };
   },
+  computed:{
+    ...mapState(["companyTreeData"]),
+    ...mapGetters(["getData"])
+  },
   created: function() {
     this.loadSearchForm();
     this.loadData();
   },
   methods: {
+    ...mapActions(["initData"]),
     loadSearchForm: function() {
       this.$ajax.get("api/Entrust/Entrust/GetSearchForm").then(response => {
+        this.initData({companyTreeData:response.company});
         this.formInitData = response;
         this.formInitData.isOrientation = [
           {
@@ -243,7 +253,8 @@ export default {
         })[0];
         optionDatas = selectOption.Children;
       }
-      var regionData = this.$store.getters.getData(selId);
+      //var regionData = this.$store.getters.getData(selId);
+      var regionData = this.getData(selId);
       if (regionData == null) {
         this.$ajax
           .get("api/Common/Common/GetArea", { params: { id: selId } })

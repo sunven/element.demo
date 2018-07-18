@@ -1,3 +1,5 @@
+import lStorage from 'store'
+
 export default {
   state: {
     regionData: []
@@ -11,6 +13,9 @@ export default {
     }
   },
   mutations: {
+    initRegionData(state, payload) {
+      state.regionData = payload;
+    },
     addRegionData(state, payload) {
       var data = state.regionData.filter(c => {
         return c.pId === payload.pId;
@@ -19,6 +24,7 @@ export default {
         return;
       }
       state.regionData.push(payload);
+      lStorage.set("regionData",state.regionData)
     }
   }
 }
