@@ -7,7 +7,7 @@
             <el-col :span="6">
               <el-form-item label="询价机构" :label-width="formLabelWidth">
                 <el-popover placement="bottom" width="160" v-model="visible2">
-                  <el-tree node-key="Id" :data="this.companyTreeData" :props="formSettings.companyProps" :expand-on-click-node="false" show-checkbox @check="companyHandleCheck">
+                  <el-tree node-key="Id" :data="companyTreeData" :props="companyProps" :expand-on-click-node="false" show-checkbox @check="companyHandleCheck">
                   </el-tree>
                   <el-input v-model="fromSearchData.ListCompanyName" :disabled="true" slot="reference">{{fromSearchData.ListCompanyName}}</el-input>
                 </el-popover>
@@ -41,7 +41,7 @@
           <el-row :gutter="20">
             <el-col :span="6">
               <el-form-item label="所在区县" :label-width="formLabelWidth">
-                <!-- <el-cascader :options="formInitData.province" @active-item-change="handleItemChange" :props="formSettings.provinceProps"></el-cascader> -->
+                <el-cascader :options="getData(0)" @active-item-change="handleItemChange" :props="provinceProps"></el-cascader>
               </el-form-item>
             </el-col>
             <el-col :span="6">
@@ -84,6 +84,7 @@
 </template>
 <script>
 import { mapState } from "vuex";
+import { mapGetters } from "vuex";
 
 export default {
   name: "create",
@@ -105,16 +106,7 @@ export default {
       },
       formLabelWidth: "120px",
       formSettings: {
-        provinceProps: {
-          label: "DictText",
-          value: "Id",
-          children: "Children"
-        },
-        companyProps: {
-          children: "Children",
-          label: "Name",
-          disabled: "NoCheck"
-        }
+        
       },
       fromSearchData: {
         searchState: "",
@@ -139,8 +131,11 @@ export default {
   },
   computed: {
     ...mapState({
-      companyTreeData: state => state.entrust_store.companyTreeData
-    })
+      companyTreeData: state => state.entrust_store.companyTreeData,
+      companyProps:state=>state.entrust_store.companyProps,
+      provinceProps: state => state.entrust_store.provinceProps
+    }),
+    ...mapGetters(["getData"])
   },
   methods: {
     handleChange(val) {
@@ -153,7 +148,38 @@ export default {
     handleClosed: function() {
       this.setVisible();
     },
-    companyHandleCheck(data, data1) {}
+    companyHandleCheck(data, data1) {},
+    handleItemChange(val) {
+      var selId = val[val.length - 1];
+      var selectOption;
+      var optionDatas = this.formInitData.province;
+      for (let index = 0; index < val.length; index++) {
+        const element = val[index];
+        selectOption = optionDatas.filter(c => {
+          return c.Id === element;
+        })[0];
+        optionDatas = selectOption.Children;
+      }
+      //var regionData = this.$store.getters.getData(selId);
+      var regionData = this.getData(selId);
+      if (regionData == null) {
+        this.$ajax
+          .get("api/Common/Common/GetArea", { params: { id: selId } })
+          .then(response => {
+            selectOption.Children = response;
+            this.addRegionData({
+              pId: selId,
+              data: response
+            });
+            // this.$store.commit("addRegionData", {
+            //   pId: selId,
+            //   data: response
+            // });
+          });
+      } else {
+        selectOption.Children = regionData.data;
+      }
+    },
   },
   watch: {
     dialogVisible(val) {

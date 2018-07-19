@@ -1,4 +1,5 @@
 import lStorage from 'store'
+import axios from 'axios'
 
 export default {
   state: {
@@ -24,7 +25,19 @@ export default {
         return;
       }
       state.regionData.push(payload);
-      lStorage.set("regionData",state.regionData)
+      lStorage.set("regionData", state.regionData)
+    }
+  },
+  actions: {
+    getRegionDataAsync({
+      commit
+    }, id) {
+      return axios
+      .get("api/Common/Common/GetArea", {
+        params: {
+          id: id
+        }
+      });
     }
   }
 }
