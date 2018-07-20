@@ -9,6 +9,7 @@ export default {
   data() {
     return {};
   },
+  props:["value"],
   computed: {
     ...mapGetters(["getData"]),
     province() {
@@ -17,6 +18,7 @@ export default {
   },
   methods: {
     handleItemChange: function(val) {
+      this.$emit('input', val);
       var selId = val[val.length - 1];
       var selectOption;
       var optionDatas = this.province;

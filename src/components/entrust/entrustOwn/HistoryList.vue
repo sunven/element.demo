@@ -16,7 +16,7 @@
         </el-form-item>
         <el-form-item label="所在区县">
           <!-- <el-cascader :options="formInitData.province" @active-item-change="handleItemChange" :props="provinceProps"></el-cascader> -->
-          <regionSelect></regionSelect>
+          <regionSelect v-model="fromSearchData.regionData"></regionSelect>
         </el-form-item>
         <el-form-item label="单据类型">
           <el-select v-model="fromSearchData.entrustType" clearable placeholder="请选择">
@@ -148,6 +148,7 @@ export default {
         isOrientation: []
       },
       fromSearchData: {
+        regionData:[],
         searchState: "",
         propertyType: "",
         entrustType: "",
