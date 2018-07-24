@@ -2,6 +2,10 @@ import lStorage from 'store'
 
 export default {
   state: {
+    propertyTypeList:[],
+    entrustTypeList:[],
+    priceTypeList:[],
+    appraisalObjectiveList:[],
     provinceProps: {
       label: "DictText",
       value: "Id",
@@ -17,6 +21,22 @@ export default {
     orgTreeData:[]
   },
   mutations: {
+    setPropertyTypeList(state, payload){
+      state.propertyTypeList = payload;
+      lStorage.set("propertyTypeList",state.propertyTypeList);
+    },
+    setEntrustTypeList(state, payload){
+      state.entrustTypeList = payload;
+      lStorage.set("entrustTypeList",state.entrustTypeList);
+    },
+    setAppraisalObjectiveList(state, payload){
+      state.appraisalObjectiveList = payload;
+      lStorage.set("appraisalObjectiveList",state.appraisalObjectiveList);
+    },
+    setPriceTypeList(state, payload){
+      state.priceTypeList = payload;
+      lStorage.set("priceTypeList",state.priceTypeList);
+    },
     setCompanyTreeData(state, payload) {
       state.companyTreeData = payload;
       lStorage.set("companyTreeData",state.companyTreeData);
