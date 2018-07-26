@@ -29,20 +29,22 @@
               <template v-for="(item, index) in menus.leftMenu">
                 <el-menu-item :key="'m'+item.Id" v-if="item.Children.length==0" :index="'i'+index">
                   <!-- <i class="el-icon-menu"></i> -->
-                  <router-link :to="item.Url">
+                  <router-link :to="item.Url.toLocaleLowerCase()">
                     <span>{{item.MenuName}}</span>
                   </router-link>
                 </el-menu-item>
                 <el-submenu v-else :key="'m'+item.Id" :index="'i'+index">
                   <template slot="title">
                     <!-- <i class="el-icon-location"></i> -->
-                    <router-link :to="item.Url">
+                    <router-link :to="item.Url.toLocaleLowerCase()">
                       <span>{{item.MenuName}}</span>
                     </router-link>
                   </template>
                   <el-menu-item-group>
                     <el-menu-item v-for="(item1,index1) in item.Children" :key="'m'+item1.Id" :index="index+'-'+index1">
-                      <router-link :to="item1.Url">{{item1.MenuName}}</router-link>
+                      <router-link :to="item1.Url.toLocaleLowerCase()">
+                        <span>{{item1.MenuName}}</span>
+                      </router-link>
                     </el-menu-item>
                   </el-menu-item-group>
                 </el-submenu>
@@ -81,6 +83,10 @@ export default {
         .get("http://localhost:5618/api/Portal/Passport/GetMenus")
         .then(response => {
           this.menus = response;
+          var arr = getRouter(response.leftMenu);
+          console.log(arr);
+          //this.$router.addRoutes(arr);
+          //this.$router.options.routes=arr;
         });
     },
     handleSelect(key, keyPath) {
@@ -95,29 +101,23 @@ export default {
   }
 };
 
-function getRouter(meuns) {
-  let routes = meuns.map(c => {
-    return {
-      path: c.Url.substr(1, c.Url.lastIndexOf("/") - 1),
-      component: { template: "<div>" + c.Url + "</div>" },
-      children: c.Children.map(p => {
-        return {
-          path: p.Url.substr(1),
-          component: { template: "<div>" + p.Url + "</div>" }
-        };
-      })
-    };
-  });
-  var arr = [
-    { path: "/", redirect: "/entrust" },
-    {
-      path: "/entrust",
-      component: { template: "<div>entrust</div>" },
-      children: routes
+function getRouter(menus) {
+  var routus = [];
+  for (let index = 0; index < menus.length; index++) {
+    const element = menus[index];
+    var path = element.Url.toLocaleLowerCase();
+    console.log(path);
+    routus.push({
+      path: path,
+      component: () => import("@/components" + path)
+    });
+    if (element.Children != 0) {
+      getRouter(element.Children).map(c => {
+        routus.push(c);
+      });
     }
-  ];
-  console.log(arr);
-  return arr;
+  }
+  return routus;
 }
 </script>
 

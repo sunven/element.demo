@@ -5,20 +5,28 @@ import VueRouter from "vue-router";
 Vue.use(VueRouter);
 
 const routes = [{
-  path: '/:area/:controller/:action',
-  
+  //path: '/:area/:controller/:action',
+  path: '/entrust',
   component: {
     //template: `<div>{{$route.params.area+'/'+$route.params.controller+'/'+$route.params.action}}</div>`
-    template:"<div>123{{$route.params.area}}</div>"
+    template:"<h1>Index1</h1>"
   },
-  // component:() => {
-  //   debugger;
-  //   import(`./components/${this.$route.params.area}/entrustOwn/HistoryList`)}
-  component:resolve => require([`./components/entrust/entrustOwn/HistoryList`], resolve)
-  // component: resolve => {
-  //   //debugger;
-  //   return require(["./components/{{$route.params.area}}/entrustOwn/HistoryList"], resolve)
-  // }
+  path: '/entrust/entrustown',
+  component: {
+    //template: `<div>{{$route.params.area+'/'+$route.params.controller+'/'+$route.params.action}}</div>`
+    template:"<h1>Index2</h1>"
+  },
+  path: '/entrust/entrustown/historyList',
+  component: {
+    //template: `<div>{{$route.params.area+'/'+$route.params.controller+'/'+$route.params.action}}</div>`
+    template:"<h1>Index3</h1>"
+  },
+  path: '/entrust/businessreport/index',
+  component: {
+    //template: `<div>{{$route.params.area+'/'+$route.params.controller+'/'+$route.params.action}}</div>`
+    template:"<h1>Index11111</h1>"
+  },
+  //component:resolve => require([`./components/entrust/entrustown/historylist`], resolve)
 }]
 
 var router = new VueRouter({

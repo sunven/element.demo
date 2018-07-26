@@ -6,12 +6,11 @@
 
 <script>
 import vissmenu from "./components/vissmenu";
-import historyList from "./components/entrust/entrustOwn/HistoryList";
 
 export default {
   name: "App",
   components: {
-    vissmenu,historyList
+    vissmenu
   }
 };
 </script>
