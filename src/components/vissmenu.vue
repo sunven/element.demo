@@ -22,23 +22,31 @@
       </el-menu>
     </el-header>
     <el-container>
-      <el-aside width="300px">
+      <el-aside width="200px">
         <el-row class="tac">
-          <el-col :span="12">
+          <el-col>
             <el-menu default-active="2" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose">
-              <el-submenu :key="'m'+item.Id" v-for="(item, index) in menus.leftMenu" :index="'i'+index">
-                <template slot="title">
-                  <i class="el-icon-location"></i>
+              <template v-for="(item, index) in menus.leftMenu">
+                <el-menu-item :key="'m'+item.Id" v-if="item.Children.length==0" :index="'i'+index">
+                  <!-- <i class="el-icon-menu"></i> -->
                   <router-link :to="item.Url">
                     <span>{{item.MenuName}}</span>
                   </router-link>
-                </template>
-                <el-menu-item-group>
-                  <el-menu-item v-for="(item1,index1) in item.Children" :key="'m'+item1.Id" :index="index+'-'+index1">
-                    <router-link :to="item1.Url">{{item1.MenuName}}</router-link>
-                  </el-menu-item>
-                </el-menu-item-group>
-              </el-submenu>
+                </el-menu-item>
+                <el-submenu v-else :key="'m'+item.Id" :index="'i'+index">
+                  <template slot="title">
+                    <!-- <i class="el-icon-location"></i> -->
+                    <router-link :to="item.Url">
+                      <span>{{item.MenuName}}</span>
+                    </router-link>
+                  </template>
+                  <el-menu-item-group>
+                    <el-menu-item v-for="(item1,index1) in item.Children" :key="'m'+item1.Id" :index="index+'-'+index1">
+                      <router-link :to="item1.Url">{{item1.MenuName}}</router-link>
+                    </el-menu-item>
+                  </el-menu-item-group>
+                </el-submenu>
+              </template>
             </el-menu>
           </el-col>
         </el-row>
