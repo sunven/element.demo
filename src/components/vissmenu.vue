@@ -83,10 +83,10 @@ export default {
         .get("http://localhost:5618/api/Portal/Passport/GetMenus")
         .then(response => {
           this.menus = response;
-          var arr = getRouter(response.leftMenu);
-          console.log(arr);
-          //this.$router.addRoutes(arr);
-          //this.$router.options.routes=arr;
+          var routus = [];
+          getRouter1(response.leftMenu, routus);
+          console.log(routus);
+          this.$router.addRoutes(routus);
         });
     },
     handleSelect(key, keyPath) {
@@ -118,6 +118,65 @@ function getRouter(menus) {
     }
   }
   return routus;
+}
+
+function getRouter1(menus, routus) {
+  for (let index = 0; index < menus.length; index++) {
+    const element = menus[index];
+    var arr = element.Url.toLocaleLowerCase().split("/");
+    //一级
+    var routuArr = routus.filter(c => {
+      return c.path == "/" + arr[1];
+    });
+    var firstRoutu;
+    if (routuArr.length == 0) {
+      firstRoutu = {
+        path: "/" + arr[1],
+        component: {
+          template: "<router-view></router-view>"
+        },
+        children: []
+      };
+      routus.push(firstRoutu);
+    } else {
+      firstRoutu = routuArr[0];
+    }
+    //二级
+    routuArr = firstRoutu.children.filter(c => {
+      return c.path == arr[2];
+    });
+    var secondRoutu;
+    if (routuArr.length == 0) {
+      secondRoutu = {
+        path: arr[2],
+        component: {
+          template: "<router-view></router-view>"
+        },
+        children: []
+      };
+      firstRoutu.children.push(secondRoutu);
+    } else {
+      secondRoutu = routuArr[0];
+    }
+    //三级
+    routuArr = secondRoutu.children.filter(c => {
+      return c.path == arr[3];
+    });
+    var thirdRoutu;
+    if (routuArr.length == 0) {
+      thirdRoutu = {
+        path: arr[3],
+        component: resolve => require(["@/components" + element.Url.toLocaleLowerCase()], resolve)
+      };
+      secondRoutu.children.push(thirdRoutu);
+    } else {
+      thirdRoutu = routuArr[0];
+    }
+
+    if (element.Children != 0) {
+      getRouter1(element.Children, routus);
+    }
+  }
 }
 </script>
 
