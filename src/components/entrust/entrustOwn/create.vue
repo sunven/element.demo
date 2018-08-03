@@ -1,6 +1,6 @@
 <template>
-  <el-dialog title="新增" :visible.sync="visible" width="80%" :fullscreen="false" @closed="handleClosed">
-    <el-form :inline="true" :model="form" size="mini">
+  <el-dialog title="新增" :visible.sync="visible" top="5vh" width="80%" :fullscreen="false" @closed="handleClosed">
+    <el-form :inline="true" label-position="right" :model="form" :rules="rules" ref="form" size="mini">
       <el-collapse v-model="activeNames" @change="handleChange">
         <el-collapse-item title="询价机构信息" name="1">
           <company v-model="form"></company>
@@ -60,7 +60,7 @@ export default {
   data() {
     return {
       visible2: false,
-      activeNames: ["1","2"],
+      activeNames: ["1", "2"],
       visible: this.dialogVisible,
       formInitData: {
         propertyTypeList: [],
@@ -70,6 +70,7 @@ export default {
         priceTypeList: []
       },
       form: {
+        qqemail: "",
         propertyType: "",
         entrustType: "",
         productId: "",
@@ -161,6 +162,12 @@ export default {
         entrustLinkman: "",
         isOrientation: "",
         timePoint: ""
+      },
+      rules: {
+        qqemail: [
+          { required: true, message: "请输入活动名称", trigger: "blur" },
+          { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" }
+        ]
       }
     };
   },
@@ -224,7 +231,7 @@ export default {
 };
 </script>
 <style>
-.el-collapse-item__header{
+.el-collapse-item__header {
   font-size: 18px;
   color: #409eff;
 }

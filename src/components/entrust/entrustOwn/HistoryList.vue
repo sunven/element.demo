@@ -1,7 +1,7 @@
 <template>
   <el-container>
-    <el-header height="240px">
-      <el-form :inline="true" :model="fromSearchData" class="demo-form-inline">
+    <el-header height="120px">
+      <el-form :inline="true" size="mini" :model="fromSearchData" class="demo-form-inline">
         <el-form-item label="业务状态">
           <el-select v-model="fromSearchData.searchState" clearable placeholder="请选择">
             <el-option v-for="item in formInitData.searchState" :key="item.Value" :label="item.Description" :value="item.Value">
@@ -73,6 +73,8 @@
           <el-input v-model="fromSearchData.entrustLinkman">{{fromSearchData.entrustLinkman}}</el-input>
         </el-form-item>
         <el-form-item label="需现场查勘">
+          <!-- <el-radio v-model="radio" label="1">是</el-radio>
+          <el-radio v-model="radio" label="2">否</el-radio> -->
           <el-select v-model="fromSearchData.isOrientation" clearable placeholder="请选择">
             <el-option v-for="item in formInitData.isOrientation" :key="item.value" :label="item.label" :value="item.Value">
             </el-option>
@@ -89,18 +91,48 @@
     </el-header>
     <el-main>
       <create :dialogVisible="dialogAddVisible" @changeVisible="getVisible"></create>
-      <el-table :data="tableData" border style="width: 100%">
-        <el-table-column fixed prop="Number" label="编号" width="150">
+      <el-table size="mini" :data="tableData" border style="width: 100%">
+        <el-table-column prop="StateName" label="状态" width="70">
         </el-table-column>
-        <el-table-column prop="StateName" label="状态" width="120">
+        <el-table-column prop="Number" label="编号" width="150">
         </el-table-column>
-        <el-table-column prop="SysOrgName" label="当前处理机构" width="120">
+        <el-table-column prop="EntrustTypeName" label="评估类型" width="100">
         </el-table-column>
-        <el-table-column prop="ProvinceName" label="省" width="120">
+        <el-table-column prop="ProductName" label="单据类型" width="120">
         </el-table-column>
-        <el-table-column prop="CityName" label="市" width="300">
+        <el-table-column prop="PropertyTypeDisplayName" label="物业类型" width="80">
         </el-table-column>
-        <el-table-column prop="CountyName" label="取" width="120">
+        <el-table-column prop="CompanyNameAndDeptName" label="询价机构" width="120">
+        </el-table-column>
+        <el-table-column prop="DetailAddress" show-overflow-tooltip="true" label="物业地址" width="200">
+        </el-table-column>
+        <el-table-column prop="CreateTime" label="创建时间" :formatter="dateFormat" width="160">
+        </el-table-column>
+        <el-table-column prop="FloorAcreage" label="建筑面积" width="80">
+        </el-table-column>
+        <el-table-column prop="LandAcreage" label="土地面积" width="80">
+        </el-table-column>
+        <el-table-column prop="ProjectName" label="所属项目" width="120">
+        </el-table-column>
+        <el-table-column prop="ProvinceName" label="省" width="70">
+        </el-table-column>
+        <el-table-column prop="CityName" label="市" width="70">
+        </el-table-column>
+        <el-table-column prop="CountyName" label="区" width="70">
+        </el-table-column>
+        <el-table-column prop="Proposer" label="贷款申请人" width="100">
+        </el-table-column>
+        <el-table-column prop="InquirerName" label="询价人" width="100">
+        </el-table-column>
+        <el-table-column prop="EntrustOrgName" label="委托方机构" width="120">
+        </el-table-column>
+        <el-table-column prop="EntrustLinkman" label="委托方联系人" width="120">
+        </el-table-column>
+        <el-table-column prop="IsOrientation" label="是否需查勘" width="120">
+        </el-table-column>
+        <el-table-column prop="SysUserName" label="当前处理人" width="120">
+        </el-table-column>
+        <el-table-column prop="TimePoint" label="价值时点" :formatter="dateFormat" width="160">
         </el-table-column>
         <el-table-column fixed="right" label="操作" width="100">
           <template slot-scope="scope">
@@ -110,7 +142,7 @@
         </el-table-column>
       </el-table>
       <div class="block">
-        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pageIndex" :page-sizes="[20, 50, 100]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="totalCount">
+        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pageIndex" :page-sizes="[15, 50, 100]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="totalCount">
         </el-pagination>
       </div>
     </el-main>
@@ -119,9 +151,12 @@
 </template>
 
 <script>
+
+import {format, compareAsc} from 'date-fns'
+
 import treenode from "./treenode";
 import create from "./create";
-import regionSelect from "./../../common/regionSelect"
+import regionSelect from "./../../common/regionSelect";
 
 import { mapState } from "vuex";
 import { mapGetters } from "vuex";
@@ -129,7 +164,7 @@ import { mapMutations } from "vuex";
 import { mapActions } from "vuex";
 
 export default {
-  components: { treenode, create,regionSelect },
+  components: { treenode, create, regionSelect },
   data() {
     return {
       dialogAddVisible: false,
@@ -148,7 +183,7 @@ export default {
         isOrientation: []
       },
       fromSearchData: {
-        regionData:[],
+        regionData: [],
         searchState: "",
         propertyType: "",
         entrustType: "",
@@ -169,7 +204,7 @@ export default {
       },
       tableData: [],
       pageIndex: 1,
-      pageSize: 20,
+      pageSize: 15,
       totalCount: 0
     };
   },
@@ -299,6 +334,10 @@ export default {
     },
     getVisible: function(value) {
       this.dialogAddVisible = value;
+    },
+    dateFormat:function(row, column, cellValue, index){
+      //2018-05-02T10:19:56.05
+      return format(cellValue,"YYYY-MM-DD HH:mm:ss");;
     },
     renderContent(h, { node, data, store }) {
       return (
