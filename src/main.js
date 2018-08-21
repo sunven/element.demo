@@ -15,7 +15,7 @@ Vue.prototype.$lStorage = lStorage
 import axios from 'axios'
 //全局的 axios 默认值
 axios.defaults.baseURL = 'http://localhost:5618';
-axios.defaults.headers.common['Authorization'] = "Basic YWRtaW46NmYxODI0MDAwYTZjYzBjYzJlZTIwOGQ1ZDdlYzM3NWU=";
+axios.defaults.headers.common['Authorization'] = "Basic YWRtaW46ZDdjNTk4ZDM1MWY0YzJlNThhYWIwOGQ1ZmU3NjI1MTM=";
 //拦截器
 axios.interceptors.response.use(function (response) {
   // 对响应数据做点什么

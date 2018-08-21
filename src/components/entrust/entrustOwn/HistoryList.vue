@@ -104,7 +104,7 @@
         </el-table-column>
         <el-table-column prop="CompanyNameAndDeptName" label="询价机构" width="120">
         </el-table-column>
-        <el-table-column prop="DetailAddress" show-overflow-tooltip="true" label="物业地址" width="200">
+        <el-table-column prop="DetailAddress" :show-overflow-tooltip="true" label="物业地址" width="200">
         </el-table-column>
         <el-table-column prop="CreateTime" label="创建时间" :formatter="dateFormat" width="160">
         </el-table-column>
