@@ -1,220 +1,222 @@
 <template>
-  <el-container>
-    <el-header height="150px">
-      <el-container>
-        <el-main>
-          <el-form
-            :inline="true"
-            size="mini"
-            :model="fromSearchData"
-            class="demo-form-inline"
+  <div>
+    <el-row>
+      <el-form
+        :inline="true"
+        size="mini"
+        :model="fromSearchData"
+        class="demo-form-inline"
+        ref="ruleForm"
+      >
+        <el-form-item label="业务状态">
+          <searchState
+            v-model="fromSearchData"
+            :data="formInitData.searchState"
+          />
+        </el-form-item>
+        <el-form-item label="物业类型">
+          <propertyType
+            v-model="fromSearchData"
+            :data="formInitData.propertyType"
+          />
+        </el-form-item>
+        <el-form-item label="所在区县">
+          <regionSelect v-model="fromSearchData.regionData"></regionSelect>
+        </el-form-item>
+        <el-form-item label="单据类型">
+          <entrustType
+            v-model="fromSearchData"
+            :data="formInitData.entrustType"
+          />
+        </el-form-item>
+        <el-form-item label="创建时间">
+          <el-date-picker
+            v-model="fromSearchData.createTime"
+            type="daterange"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
           >
-            <el-form-item label="业务状态">
-              <el-select
-                v-model="fromSearchData.searchState"
-                clearable
-                placeholder="请选择"
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item label="询价机构">
+          <el-popover
+            placement="bottom"
+            width="160"
+            v-model="visible2"
+          >
+            <el-tree
+              node-key="Id"
+              :data="formInitData.company"
+              :props="companyProps"
+              :expand-on-click-node="false"
+              show-checkbox
+              @check="companyHandleCheck"
+            >
+            </el-tree>
+            <el-input
+              v-model="fromSearchData.ListCompanyName"
+              :disabled="true"
+              slot="reference"
+            >{{fromSearchData.ListCompanyName}}</el-input>
+          </el-popover>
+        </el-form-item>
+        <el-form-item label="进件时间">
+          <el-date-picker
+            v-model="fromSearchData.incomingTime"
+            type="daterange"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+          >
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item label="分组号">
+          <el-input v-model="fromSearchData.groupNumber">{{fromSearchData.groupNumber}}</el-input>
+        </el-form-item>
+
+        <el-form-item label="">
+          <el-input
+            placeholder="请输入内容"
+            v-model="fromSearchData.comCondition"
+            class="input-with-select"
+          >
+            <el-select
+              v-model="fromSearchData.conditionType"
+              slot="prepend"
+              placeholder="请选择"
+            >
+              <el-option
+                label="常用关键字"
+                value="0"
+              ></el-option>
+              <el-option
+                label="其他关键字"
+                value="1"
+              ></el-option>
+            </el-select>
+          </el-input>
+        </el-form-item><el-form-item label="委托方机构">
+            <el-popover
+              placement="bottom"
+              width="160"
+              v-model="entrustOrgVisible"
+            >
+              <el-tree
+                node-key="Id"
+                :data="formInitData.company"
+                :props="companyProps"
+                :expand-on-click-node="false"
+                show-checkbox
+                @check="entrustOrgHandleCheck"
               >
-                <el-option
-                  v-for="item in formInitData.searchState"
-                  :key="item.Value"
-                  :label="item.Description"
-                  :value="item.Value"
-                >
-                </el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="物业类型">
-              <el-select
-                v-model="fromSearchData.propertyType"
-                clearable
-                placeholder="请选择"
-              >
-                <el-option
-                  v-for="item in formInitData.propertyType"
-                  :key="item.Id"
-                  :label="item.DictText"
-                  :value="item.Id"
-                >
-                </el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="所在区县">
-              <!-- <el-cascader :options="formInitData.province" @active-item-change="handleItemChange" :props="provinceProps"></el-cascader> -->
-              <regionSelect v-model="fromSearchData.regionData"></regionSelect>
-            </el-form-item>
-            <el-form-item label="单据类型">
-              <el-select
-                v-model="fromSearchData.entrustType"
-                clearable
-                placeholder="请选择"
-              >
-                <el-option
-                  v-for="item in formInitData.entrustType"
-                  :key="item.Value"
-                  :label="item.Description"
-                  :value="item.Value"
-                >
-                </el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="创建时间">
-              <el-date-picker
-                v-model="fromSearchData.createTime"
-                type="daterange"
-                range-separator="至"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-              >
-              </el-date-picker>
-            </el-form-item>
-            <el-form-item label="进件时间">
-              <el-date-picker
-                v-model="fromSearchData.incomingTime"
-                type="daterange"
-                range-separator="至"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-              >
-              </el-date-picker>
-            </el-form-item>
-            <el-form-item label="分组号">
-              <el-input v-model="fromSearchData.groupNumber">{{fromSearchData.groupNumber}}</el-input>
-            </el-form-item>
-            <el-form-item label="">
-              <el-input v-model="fromSearchData.comCondition">{{fromSearchData.comCondition}}</el-input>
-            </el-form-item>
-            <el-form-item label="询价机构">
-              <el-popover
-                placement="bottom"
-                width="160"
-                v-model="visible2"
-              >
-                <!-- <el-tree node-key="Id" :data="formInitData.company" :props="formSettings.companyProps" :check-strictly="true" @node-click="handleNodeClick">
-              <span class="custom-tree-node" slot-scope="{ node, data }">
-                <span>
-                  <span v-if="!(data.ParentId==0||data.Type==3||data.Type==4||data.Type==0||data.Type==-1)">
-                    <el-checkbox v-model="checked"></el-checkbox>
-                  </span>
-                  <span>{{ node.label }}</span>
-                </span>
-              </span>
-            </el-tree> -->
-                <el-tree
-                  node-key="Id"
-                  :data="formInitData.company"
-                  :props="companyProps"
-                  :expand-on-click-node="false"
-                  show-checkbox
-                  @check="companyHandleCheck"
-                >
-                </el-tree>
-                <el-input
-                  v-model="fromSearchData.ListCompanyName"
-                  :disabled="true"
-                  slot="reference"
-                >{{fromSearchData.ListCompanyName}}</el-input>
-              </el-popover>
-            </el-form-item>
-            <el-form-item label="询价人">
-              <el-popover
-                placement="bottom"
-                width="160"
-                v-model="visible1"
-              >
-                <el-tree
-                  node-key="Id"
-                  :data="formInitData.ListInquirerId"
-                  :props="companyProps"
-                  :expand-on-click-node="false"
-                  show-checkbox
-                  @check="inquirerHandleCheck"
-                >
-                </el-tree>
-                <el-input
-                  v-model="fromSearchData.ListInquirerName"
-                  :disabled="true"
-                  slot="reference"
-                >{{fromSearchData.ListInquirerName}}</el-input>
-              </el-popover>
-            </el-form-item>
-            <el-form-item label="委托方机构">
-              <el-popover
-                placement="bottom"
-                width="160"
-                v-model="entrustOrgVisible"
-              >
-                <el-tree
-                  node-key="Id"
-                  :data="formInitData.company"
-                  :props="companyProps"
-                  :expand-on-click-node="false"
-                  show-checkbox
-                  @check="entrustOrgHandleCheck"
-                >
-                </el-tree>
-                <el-input
-                  v-model="fromSearchData.ListEntrustOrgName"
-                  :disabled="true"
-                  slot="reference"
-                >{{fromSearchData.ListEntrustOrgName}}</el-input>
-              </el-popover>
-            </el-form-item>
-            <el-form-item label="委托方联系人">
-              <el-input v-model="fromSearchData.entrustLinkman">{{fromSearchData.entrustLinkman}}</el-input>
-            </el-form-item>
-            <el-form-item label="需现场查勘">
-              <!-- <el-radio v-model="radio" label="1">是</el-radio>
-          <el-radio v-model="radio" label="2">否</el-radio> -->
-              <!-- <el-select v-model="fromSearchData.isOrientation" clearable placeholder="请选择">
-                <el-option v-for="item in formInitData.isOrientation" :key="item.value" :label="item.label" :value="item.Value">
-                </el-option>
-              </el-select> -->
-              <el-radio
-                v-model="radio"
-                label="1"
-              >是</el-radio>
-              <el-radio
-                v-model="radio"
-                label="2"
-              >否</el-radio>
-            </el-form-item>
-            <el-form-item label="价值时点">
-              <el-date-picker
-                v-model="fromSearchData.timePoint"
-                type="daterange"
-                range-separator="至"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-              >
-              </el-date-picker>
-            </el-form-item>
-            <el-form-item>
-              <el-button
-                type="primary"
-                @click="onSubmit"
-              >查询</el-button>
-              <el-button
-                type="primary"
-                @click="onAdd"
-                size="mini"
-              >Add</el-button>
-            </el-form-item>
-          </el-form>
-        </el-main>
-      </el-container>
-    </el-header>
-    <el-main>
-      <create
-        :dialogVisible="dialogAddVisible"
-        @changeVisible="getVisible"
-      ></create>
+              </el-tree>
+              <el-input
+                v-model="fromSearchData.ListEntrustOrgName"
+                :disabled="true"
+                slot="reference"
+              >{{fromSearchData.ListEntrustOrgName}}</el-input>
+            </el-popover>
+          </el-form-item>
+          <el-form-item label="分发流水号">
+            <el-input v-model="fromSearchData.CaseId"></el-input>
+          </el-form-item>
+        <el-col
+          v-if="isExpand"
+          :span="24"
+        >
+        </el-col>
+        <el-col
+          v-if="isExpand"
+          :span="24"
+        >
+          <el-form-item label="业务完成时间">
+            <el-date-picker
+              v-model="fromSearchData.createTime"
+              wi
+              type="daterange"
+              range-separator="至"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
+            >
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item label="价值时点">
+            <el-date-picker
+              v-model="fromSearchData.createTime"
+              type="daterange"
+              range-separator="至"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
+            >
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item label="盖章时间">
+            <el-date-picker
+              v-model="fromSearchData.createTime"
+              type="daterange"
+              range-separator="至"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
+            >
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item label="分组流水号">
+            <el-input v-model="fromSearchData.GroupCaseId"></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="24">
+          <el-form-item>
+            <el-button
+              type="primary"
+              @click="onSubmit"
+            >查询</el-button>
+            <el-button @click="resetForm('ruleForm')">重置</el-button>
+            <el-button
+              type="info"
+              plain
+            >导出当前页</el-button>
+            <el-button
+              type="info"
+              plain
+            >导出全部</el-button>
+            <el-button
+              @click="()=>{isExpand=!isExpand}"
+              type="text"
+            >{{isExpand?"收起更多":"展开更多"}}<i
+                class="el-icon--right"
+                :class="isExpand?'el-icon-arrow-down':'el-icon-arrow-up'"
+              ></i></el-button>
+          </el-form-item>
+        </el-col>
+
+      </el-form>
+    </el-row>
+    <el-row>
       <el-table
         size="mini"
         :data="tableData"
         border
         style="width: 100%"
+        height="600"
       >
+        <el-table-column
+          fixed="left"
+          label="操作"
+          width="100"
+        >
+          <template slot-scope="scope">
+            <el-button
+              @click="handleClick(scope.row)"
+              type="text"
+              size="small"
+            >查看</el-button>
+            <el-button
+              type="text"
+              size="small"
+            >编辑</el-button>
+          </template>
+        </el-table-column>
         <el-table-column
           prop="StateName"
           label="状态"
@@ -248,7 +250,7 @@
         <el-table-column
           prop="CompanyNameAndDeptName"
           label="询价机构"
-          width="120"
+          width="140"
         >
         </el-table-column>
         <el-table-column
@@ -286,19 +288,8 @@
         <el-table-column
           prop="ProvinceName"
           label="省"
-          width="70"
-        >
-        </el-table-column>
-        <el-table-column
-          prop="CityName"
-          label="市"
-          width="70"
-        >
-        </el-table-column>
-        <el-table-column
-          prop="CountyName"
-          label="区"
-          width="70"
+          width="210"
+          :formatter="(row)=>row.ProvinceName+' - '+row.CityName+' - '+row.CountyName"
         >
         </el-table-column>
         <el-table-column
@@ -344,47 +335,38 @@
           width="160"
         >
         </el-table-column>
-        <el-table-column
-          fixed="right"
-          label="操作"
-          width="100"
-        >
-          <template slot-scope="scope">
-            <el-button
-              @click="handleClick(scope.row)"
-              type="text"
-              size="small"
-            >查看</el-button>
-            <el-button
-              type="text"
-              size="small"
-            >编辑</el-button>
-          </template>
-        </el-table-column>
       </el-table>
-      <div class="block">
-        <el-pagination
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          :current-page="pageIndex"
-          :page-sizes="[15, 50, 100]"
-          :page-size="pageSize"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="totalCount"
-        >
-        </el-pagination>
-      </div>
-    </el-main>
-  </el-container>
+    </el-row>
+    <div class="block">
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="pageIndex"
+        :page-sizes="[15, 50, 100]"
+        :page-size="pageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="totalCount"
+      >
+      </el-pagination>
+    </div>
+  </div>
 
 </template>
-
+<style>
+.el-select .el-input {
+  width: 120px;
+}
+.input-with-select .el-input-group__prepend {
+  background-color: #fff;
+}
+</style>
 <script>
 import { format, compareAsc } from "date-fns";
 
-import treenode from "./treenode";
-import create from "./create";
 import regionSelect from "./../../common/regionSelect";
+import searchState from "../../common/searchState";
+import propertyType from "../../common/propertyType";
+import entrustType from "../../common/entrustType";
 
 import { mapState } from "vuex";
 import { mapGetters } from "vuex";
@@ -392,9 +374,12 @@ import { mapMutations } from "vuex";
 import { mapActions } from "vuex";
 
 export default {
-  components: { treenode, create, regionSelect },
+  name:"c-entrust-businesssearch-index",
+  components: { regionSelect, searchState, propertyType, entrustType },
   data() {
     return {
+      includedComponents:'create1',
+      isExpand: false,
       radio: 1,
       dialogAddVisible: false,
       checked: false,
@@ -429,7 +414,8 @@ export default {
         ListEntrustOrgName: "",
         entrustLinkman: "",
         isOrientation: "",
-        timePoint: ""
+        timePoint: "",
+        coditionType: 0
       },
       tableData: [],
       pageIndex: 1,
@@ -490,6 +476,9 @@ export default {
           this.tableData = response.Items;
           this.totalCount = response.TotalItemCount;
         });
+    },
+    resetForm(formName) {
+      this.$refs[formName].resetFields();
     },
     onAdd() {
       this.dialogAddVisible = true;

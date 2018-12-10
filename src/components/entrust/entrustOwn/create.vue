@@ -1,6 +1,6 @@
 <template>
   <el-dialog title="新增" :visible.sync="visible" top="5vh" width="80%" :fullscreen="false" @closed="handleClosed">
-    <el-form :inline="true" label-position="right" :model="form" :rules="rules" ref="form" size="mini">
+    <el-form :inline="true" :label-position="labelPosition" label-width="130px" :model="form" :rules="rules" ref="form" size="mini">
       <el-collapse v-model="activeNames" @change="handleChange">
         <el-collapse-item title="询价机构信息" name="1">
           <company v-model="form"></company>
@@ -59,6 +59,7 @@ export default {
   props: ["dialogVisible"],
   data() {
     return {
+      labelPosition:"right",
       visible2: false,
       activeNames: ["1", "2"],
       visible: this.dialogVisible,
