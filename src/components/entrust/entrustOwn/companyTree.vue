@@ -7,7 +7,7 @@
 </template>
 <style scoped>
 
-/deep/ .popover{
+.popover{
   height:200px;
 }
 </style>
