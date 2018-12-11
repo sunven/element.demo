@@ -17,7 +17,7 @@
         <el-form-item label="物业类型">
           <propertyType
             v-model="fromSearchData"
-            :data="formInitData.propertyType"
+            :data="propertyTypeList"
           />
         </el-form-item>
         <el-form-item label="所在区县">
@@ -26,7 +26,7 @@
         <el-form-item label="单据类型">
           <entrustType
             v-model="fromSearchData"
-            :data="formInitData.entrustType"
+            :data="entrustTypeList"
           />
         </el-form-item>
         <el-form-item label="创建时间">
@@ -40,26 +40,7 @@
           </el-date-picker>
         </el-form-item>
         <el-form-item label="询价机构">
-          <el-popover
-            placement="bottom"
-            width="160"
-            v-model="visible2"
-          >
-            <el-tree
-              node-key="Id"
-              :data="formInitData.company"
-              :props="companyProps"
-              :expand-on-click-node="false"
-              show-checkbox
-              @check="companyHandleCheck"
-            >
-            </el-tree>
-            <el-input
-              v-model="fromSearchData.ListCompanyName"
-              :disabled="true"
-              slot="reference"
-            >{{fromSearchData.ListCompanyName}}</el-input>
-          </el-popover>
+          <companyTree v-model="fromSearchData"/>
         </el-form-item>
         <el-form-item label="进件时间">
           <el-date-picker
@@ -96,31 +77,32 @@
               ></el-option>
             </el-select>
           </el-input>
-        </el-form-item><el-form-item label="委托方机构">
-            <el-popover
-              placement="bottom"
-              width="160"
-              v-model="entrustOrgVisible"
+        </el-form-item>
+        <el-form-item label="委托方机构">
+          <el-popover
+            placement="bottom"
+            width="160"
+            v-model="entrustOrgVisible"
+          >
+            <el-tree
+              node-key="Id"
+              :data="formInitData.company"
+              :props="companyProps"
+              :expand-on-click-node="false"
+              show-checkbox
+              @check="entrustOrgHandleCheck"
             >
-              <el-tree
-                node-key="Id"
-                :data="formInitData.company"
-                :props="companyProps"
-                :expand-on-click-node="false"
-                show-checkbox
-                @check="entrustOrgHandleCheck"
-              >
-              </el-tree>
-              <el-input
-                v-model="fromSearchData.ListEntrustOrgName"
-                :disabled="true"
-                slot="reference"
-              >{{fromSearchData.ListEntrustOrgName}}</el-input>
-            </el-popover>
-          </el-form-item>
-          <el-form-item label="分发流水号">
-            <el-input v-model="fromSearchData.CaseId"></el-input>
-          </el-form-item>
+            </el-tree>
+            <el-input
+              v-model="fromSearchData.ListEntrustOrgName"
+              :disabled="true"
+              slot="reference"
+            >{{fromSearchData.ListEntrustOrgName}}</el-input>
+          </el-popover>
+        </el-form-item>
+        <el-form-item label="分发流水号">
+          <el-input v-model="fromSearchData.CaseId"></el-input>
+        </el-form-item>
         <el-col
           v-if="isExpand"
           :span="24"
@@ -173,12 +155,10 @@
             >查询</el-button>
             <el-button @click="resetForm('ruleForm')">重置</el-button>
             <el-button
-              type="info"
-              plain
+              type="text"
             >导出当前页</el-button>
             <el-button
-              type="info"
-              plain
+               type="text"
             >导出全部</el-button>
             <el-button
               @click="()=>{isExpand=!isExpand}"
@@ -342,7 +322,7 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page="pageIndex"
-        :page-sizes="[15, 50, 100]"
+        :page-sizes="[10, 50, 100]"
         :page-size="pageSize"
         layout="total, sizes, prev, pager, next, jumper"
         :total="totalCount"
@@ -367,6 +347,7 @@ import regionSelect from "./../../common/regionSelect";
 import searchState from "../../common/searchState";
 import propertyType from "../../common/propertyType";
 import entrustType from "../../common/entrustType";
+import companyTree from "../../entrust/entrustown/companyTree"
 
 import { mapState } from "vuex";
 import { mapGetters } from "vuex";
@@ -374,11 +355,10 @@ import { mapMutations } from "vuex";
 import { mapActions } from "vuex";
 
 export default {
-  name:"c-entrust-businesssearch-index",
-  components: { regionSelect, searchState, propertyType, entrustType },
+  components: { regionSelect, searchState, propertyType, entrustType,companyTree },
   data() {
     return {
-      includedComponents:'create1',
+      includedComponents: "create1",
       isExpand: false,
       radio: 1,
       dialogAddVisible: false,
@@ -388,7 +368,21 @@ export default {
       entrustOrgVisible: false,
       formSettings: {},
       formInitData: {
-        searchState: [],
+        searchState: [
+          { text: "全部", value: "0" },
+          { text: "补充资料", value: "65536" },
+          { text: "已超时", value: "4096" },
+          { text: "抢单中", value: "1" },
+          { text: "查勘中", value: "16" },
+          { text: "评估中", value: "64" },
+          { text: "审核中", value: "256" },
+          { text: "盖章中", value: "16384" },
+          { text: "撤销中", value: "1024" },
+          { text: "无法评估", value: "131072" },
+          { text: "已撤销", value: "2048" },
+          { text: "已盖章", value: "32768" },
+          { text: "已完成", value: "512" }
+        ],
         propertyType: [],
         entrustType: [],
         province: [],
@@ -427,42 +421,23 @@ export default {
     ...mapState({
       companyTreeData: state => state.entrust_store.companyTreeData,
       companyProps: state => state.entrust_store.companyProps,
-      provinceProps: state => state.entrust_store.provinceProps
+      provinceProps: state => state.entrust_store.provinceProps,
+      propertyTypeList: state => state.entrust_store.propertyTypeList,
+      entrustTypeList:state => state.entrust_store.entrustTypeList
       //currentRegionData: state => state.global_store.currentRegionData
     }),
     ...mapGetters(["getData"])
   },
   created: function() {
-    this.loadSearchForm();
     this.loadData();
   },
   methods: {
     ...mapMutations(["addRegionData"]),
     ...mapActions(["initData", "getRegionDataAsync"]),
-    loadSearchForm: function() {
-      this.$ajax.get("api/Entrust/Entrust/GetSearchForm").then(response => {
-        this.initData({ companyTreeData: response.company });
-        this.addRegionData({
-          pId: 0,
-          data: response.province
-        });
-        this.formInitData = response;
-        this.formInitData.isOrientation = [
-          {
-            value: "true",
-            label: "是"
-          },
-          {
-            value: "false",
-            label: "否"
-          }
-        ];
-      });
-    },
     loadData: function() {
       var vm = this;
       this.$ajax
-        .post("api/Entrust/Entrust/GetHistoryList", {
+        .post("api/entrust/BusinessSearch/SearchEntrustList", {
           Order: {
             CreateTime: 0
           },
@@ -499,30 +474,6 @@ export default {
     handleCurrentChange(val) {
       this.pageIndex = val;
       this.loadData();
-    },
-    handleItemChange(val) {
-      var selId = val[val.length - 1];
-      var selectOption;
-      var optionDatas = this.formInitData.province;
-      for (let index = 0; index < val.length; index++) {
-        const element = val[index];
-        selectOption = optionDatas.filter(c => {
-          return c.Id === element;
-        })[0];
-        optionDatas = selectOption.Children;
-      }
-      var regionData = this.getData(selId);
-      if (regionData == null) {
-        this.getRegionDataAsync(selId).then(response => {
-          this.addRegionData({
-            pId: selId,
-            data: response
-          });
-          selectOption.Children = this.getData(selId).data;
-        });
-      } else {
-        selectOption.Children = regionData.data;
-      }
     },
     companyHandleCheck(data, data1) {
       this.fromSearchData.ListCompanyId = data1.checkedKeys;
@@ -576,28 +527,6 @@ export default {
           nodelabel={node.label}
         />
       );
-      // if (
-      //   data.ParentId == 0 ||
-      //   data.Type == 3 ||
-      //   data.Type == 4 ||
-      //   data.Type == 0 ||
-      //   data.Type == -1
-      // ) {
-      //   return (
-      //     <span class="custom-tree-node">
-      //       <span>{node.label}</span>
-      //     </span>
-      //   );
-      // } else {
-      //   return (
-      //     <span class="custom-tree-node">
-      //       <span>
-      //         <el-checkbox v-model="checked" />
-      //       </span>
-      //       <span>{node.label}</span>
-      //     </span>
-      //   );
-      // }
     }
   }
 };

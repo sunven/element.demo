@@ -6,9 +6,9 @@
   >
     <el-option
       v-for="item in data"
-      :key="item.Value"
-      :label="item.Description"
-      :value="item.Value"
+      :key="item.value"
+      :label="item.text"
+      :value="item.value"
     >
     </el-option>
   </el-select>

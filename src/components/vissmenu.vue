@@ -103,18 +103,6 @@
         </el-tabs>
         <el-main style="padding:4px;">
           <layout/>
-          <!-- <keep-alive :include="abc">
-            <router-view></router-view>
-          </keep-alive> -->
-          <!-- <transition
-            name="move"
-            mode="out-in"
-          > -->
-          <!-- <keep-alive>
-            <router-view v-if="$route.meta.keepAlive"></router-view>
-          </keep-alive>
-          <router-view v-if="!$route.meta.keepAlive"></router-view> -->
-          <!-- </transition> -->
         </el-main>
       </el-main>
     </el-container>
@@ -148,8 +136,7 @@ export default {
           label: "Index",
           name: "/"
         }
-      ],
-      abc: ["c-entrust-businesssearch-index"]
+      ]
     };
   },
   created: function() {
@@ -171,7 +158,7 @@ export default {
           //     children: routus
           //   }
           // ];
-          console.log(routus)
+          //console.log(routus)
           this.$router.addRoutes(routus);
         });
     },

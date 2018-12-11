@@ -455,7 +455,7 @@ export default {
     ...mapActions(["initData", "getRegionDataAsync"]),
     loadSearchForm: function() {
       this.$ajax.get("api/Entrust/Entrust/GetSearchForm").then(response => {
-        this.initData({ companyTreeData: response.company });
+        this.initData(response);
         this.addRegionData({
           pId: 0,
           data: response.province

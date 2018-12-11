@@ -2,10 +2,10 @@ import lStorage from 'store'
 
 export default {
   state: {
-    propertyTypeList:[],
-    entrustTypeList:[],
-    priceTypeList:[],
-    appraisalObjectiveList:[],
+    propertyTypeList: [],
+    entrustTypeList: [],
+    priceTypeList: [],
+    appraisalObjectiveList: [],
     provinceProps: {
       label: "DictText",
       value: "Id",
@@ -17,29 +17,29 @@ export default {
       label: "Name",
       disabled: "NoCheck"
     },
-    companyUserTreeData:[],
-    orgTreeData:[]
+    companyUserTreeData: [],
+    orgTreeData: []
   },
   mutations: {
-    setPropertyTypeList(state, payload){
+    setPropertyTypeList(state, payload) {
       state.propertyTypeList = payload;
-      lStorage.set("propertyTypeList",state.propertyTypeList);
+      lStorage.set("propertyTypeList", state.propertyTypeList);
     },
-    setEntrustTypeList(state, payload){
+    setEntrustTypeList(state, payload) {
       state.entrustTypeList = payload;
-      lStorage.set("entrustTypeList",state.entrustTypeList);
+      lStorage.set("entrustTypeList", state.entrustTypeList);
     },
-    setAppraisalObjectiveList(state, payload){
+    setAppraisalObjectiveList(state, payload) {
       state.appraisalObjectiveList = payload;
-      lStorage.set("appraisalObjectiveList",state.appraisalObjectiveList);
+      lStorage.set("appraisalObjectiveList", state.appraisalObjectiveList);
     },
-    setPriceTypeList(state, payload){
+    setPriceTypeList(state, payload) {
       state.priceTypeList = payload;
-      lStorage.set("priceTypeList",state.priceTypeList);
+      lStorage.set("priceTypeList", state.priceTypeList);
     },
     setCompanyTreeData(state, payload) {
       state.companyTreeData = payload;
-      lStorage.set("companyTreeData",state.companyTreeData);
+      lStorage.set("companyTreeData", state.companyTreeData);
     },
     setCompanyUserTreeData(state, payload) {
       var data = state.companyUserTreeData.filter(c => {
@@ -49,21 +49,29 @@ export default {
         return;
       }
       state.companyUserTreeData.push(payload);
-      lStorage.set("companyUserTreeData",state.regionData);
+      lStorage.set("companyUserTreeData", state.regionData);
     },
     setOrgTreeData(state, payload) {
-        state.orgTreeData = payload;
-        lStorage.set("orgTreeData",state.orgTreeData);
-      }
+      state.orgTreeData = payload;
+      lStorage.set("orgTreeData", state.orgTreeData);
+    }
   },
-  actions:{
-    initData({commit},payload){
-        if (payload.companyTreeData) {
-            commit('setCompanyTreeData',payload.companyTreeData);
-        }
-        if (payload.orgTreeData) {
-            commit('setOrgTreeData',payload.orgTreeData);
-        }
+  actions: {
+    initData({
+      commit
+    }, payload) {
+      if (payload.company) {
+        commit('setCompanyTreeData', payload.company);
+      }
+      if (payload.orgTreeData) {
+        commit('setOrgTreeData', payload.orgTreeData);
+      }
+      if (payload.propertyType) {
+        commit('setPropertyTypeList', payload.propertyType);
+      }
+      if (payload.entrustType) {
+        commit('setEntrustTypeList', payload.entrustType);
+      }
     }
   }
 }
